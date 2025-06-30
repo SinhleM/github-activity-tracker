@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react'; // ADDED useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, RefreshCw, Github, GitCommit, Code2, Calendar } from 'lucide-react';
 
 import Header from '../components/Header.jsx';
 import GitHubActivityOverview from '../components/GitHubActivityOverview.jsx';
-import Charts from '../components/Charts.jsx';
+// Corrected import for multiple chart components from Chart.jsx
+import { LineChartComponent, BarChartComponent, PieChartComponent, DonutChartComponent, MultiLineChartComponent, StackedBarChartComponent } from '../components/Charts.jsx'; 
 
 const RepositoryList = ({ repositories, isLoading }) => {
   if (isLoading) {
@@ -148,28 +149,27 @@ const Home = () => {
     try {
       setIsLoading(true);
       setError(null);
-
-      // Simulate API call with mock data for development
-      // Replace this with your actual API call
-      const mockData = [
-        { repo: 'react-dashboard', commits: 45, languages: 'JavaScript, CSS, HTML' },
-        { repo: 'python-automation', commits: 32, languages: 'Python, Shell' },
-        { repo: 'web-scraper', commits: 28, languages: 'Python, JavaScript' },
-        { repo: 'mobile-app', commits: 67, languages: 'JavaScript, TypeScript' },
-        { repo: 'data-analysis', commits: 23, languages: 'Python, R' },
-        { repo: 'api-server', commits: 41, languages: 'Node.js, JavaScript' }
-      ];
-
-      // Simulate loading delay
-      setTimeout(() => {
-        setData(mockData);
-        setLastUpdated(new Date().toISOString());
-        setIsLoading(false);
-      }, 1000);
-
+      
+      // Removed mock data and setTimeout
+      const response = await fetch('/api/github-activity');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      
+      setData(result);
+      setLastUpdated(new Date().toISOString());
+      
     } catch (err) {
       setError(err.message);
       console.error('Error fetching GitHub activity:', err);
+    } finally { // Use finally to ensure isLoading is set to false
       setIsLoading(false);
     }
   };
@@ -183,7 +183,7 @@ const Home = () => {
   const totalCommits = data.reduce((sum, repo) => sum + (repo.commits || 0), 0);
   const totalStars = 128; // You can calculate this from your data
   const totalForks = 45;  // You can calculate this from your data
-
+  
   // Calculate active languages
   const uniqueLanguages = new Set();
   data.forEach(repo => {
@@ -193,7 +193,7 @@ const Home = () => {
   });
   const activeLanguages = uniqueLanguages.size;
 
-  // ADDED: Prepare data for the charts using useMemo for efficiency
+  // Prepare data for the charts using useMemo for efficiency
   const { commitChartData, languageChartData } = useMemo(() => {
     // Data for the commit bar chart
     const commitData = data.map(repo => ({
@@ -250,7 +250,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Component */}
       <Header currentPath="/" />
-
+      
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
@@ -276,7 +276,7 @@ const Home = () => {
         </div>
 
         {/* GitHub Activity Overview Component */}
-        <GitHubActivityOverview
+        <GitHubActivityOverview 
           totalRepos={totalRepos}
           totalCommits={totalCommits}
           totalStars={totalStars}
@@ -290,7 +290,7 @@ const Home = () => {
           {/* Commit Activity Chart */}
           <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
             {!isLoading && data.length > 0 ? (
-              <Charts.BarChartComponent
+              <BarChartComponent // Using BarChartComponent from Chart.jsx
                 data={commitChartData}
                 xAxisKey="name"
                 barKey="commits"
@@ -308,7 +308,7 @@ const Home = () => {
           {/* Language Distribution Donut Chart */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
              {!isLoading && data.length > 0 ? (
-              <Charts.DonutChartComponent
+              <DonutChartComponent // Using DonutChartComponent from Chart.jsx
                 data={languageChartData}
                 dataKey="value"
                 nameKey="name"
@@ -327,11 +327,11 @@ const Home = () => {
         {/* Secondary Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Language Distribution */}
-          <LanguageDistribution
+          <LanguageDistribution 
             repositories={data}
             isLoading={isLoading}
           />
-
+          
           {/* Additional Stats Card */}
           {!isLoading && data.length > 0 && (
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -368,7 +368,7 @@ const Home = () => {
         </div>
 
         {/* Repository List Component */}
-        <RepositoryList
+        <RepositoryList 
           repositories={data}
           isLoading={isLoading}
         />
