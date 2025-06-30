@@ -1,75 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // ADDED useMemo
 import { AlertCircle, RefreshCw, Github, GitCommit, Code2, Calendar } from 'lucide-react';
 
-// Mock components that match your structure - replace these with your actual components
-const GitHubActivityOverview = ({ totalRepos, totalCommits, isLoading }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">Total Repositories</p>
-          <div className="text-3xl font-bold text-gray-900">
-            {isLoading ? (
-              <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-            ) : (
-              totalRepos
-            )}
-          </div>
-        </div>
-        <Github className="h-8 w-8 text-blue-500" />
-      </div>
-    </div>
-    
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">Total Commits</p>
-          <div className="text-3xl font-bold text-gray-900">
-            {isLoading ? (
-              <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-            ) : (
-              totalCommits
-            )}
-          </div>
-        </div>
-        <GitCommit className="h-8 w-8 text-green-500" />
-      </div>
-    </div>
-    
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">Active Languages</p>
-          <div className="text-3xl font-bold text-gray-900">
-            {isLoading ? (
-              <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-            ) : (
-              '5+'
-            )}
-          </div>
-        </div>
-        <Code2 className="h-8 w-8 text-purple-500" />
-      </div>
-    </div>
-    
-    <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">Last Updated</p>
-          {/* FIX: Changed <p> to <div> to correctly nest the loading div */}
-          <div className="text-sm font-bold text-gray-900">
-            {isLoading ? (
-              <div className="animate-pulse bg-gray-200 h-4 w-20 rounded"></div>
-            ) : (
-              new Date().toLocaleDateString()
-            )}
-          </div>
-        </div>
-        <Calendar className="h-8 w-8 text-orange-500" />
-      </div>
-    </div>
-  </div>
-);
+import Header from '../components/Header.jsx';
+import GitHubActivityOverview from '../components/GitHubActivityOverview.jsx';
+import Charts from '../components/Charts.jsx';
 
 const RepositoryList = ({ repositories, isLoading }) => {
   if (isLoading) {
@@ -143,41 +77,62 @@ const RepositoryList = ({ repositories, isLoading }) => {
   );
 };
 
-const CommitActivityChart = ({ repositories, isLoading }) => {
+const LanguageDistribution = ({ repositories, isLoading }) => {
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Commit Activity</h2>
-        <div className="animate-pulse bg-gray-200 h-64 rounded"></div>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
+        <div className="animate-pulse space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div className="bg-gray-200 h-4 w-20 rounded"></div>
+              <div className="bg-gray-200 h-6 w-16 rounded-full"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
-  const maxCommits = Math.max(...repositories.map(repo => repo.commits));
+  if (!repositories || repositories.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
+        <div className="text-center text-gray-500 py-8">
+          <Code2 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p>No language data available</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate language distribution
+  const languageCount = {};
+  repositories.forEach(repo => {
+    if (repo.languages && repo.languages !== 'N/A') {
+      const languages = repo.languages.split(', ');
+      languages.forEach(lang => {
+        languageCount[lang] = (languageCount[lang] || 0) + 1;
+      });
+    }
+  });
+
+  const sortedLanguages = Object.entries(languageCount)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 6);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Commit Activity by Repository</h2>
-      <div className="space-y-4">
-        {repositories.map((repo, index) => {
-          const percentage = maxCommits > 0 ? (repo.commits / maxCommits) * 100 : 0;
-          return (
-            <div key={index} className="flex items-center space-x-4">
-              <div className="w-32 text-sm font-medium text-gray-700 truncate">
-                {repo.repo}
-              </div>
-              <div className="flex-1 bg-gray-200 rounded-full h-4 relative">
-                <div
-                  className="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${percentage}%` }}
-                ></div>
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-white">
-                  {repo.commits}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
+      <div className="space-y-3">
+        {sortedLanguages.map(([language, count], index) => (
+          <div key={index} className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700">{language}</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+              {count} {count === 1 ? 'repo' : 'repos'}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -193,26 +148,28 @@ const Home = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const response = await fetch('/api/github-activity');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      // Handle error responses from your Flask API
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      
-      setData(result);
-      setLastUpdated(new Date().toISOString());
+
+      // Simulate API call with mock data for development
+      // Replace this with your actual API call
+      const mockData = [
+        { repo: 'react-dashboard', commits: 45, languages: 'JavaScript, CSS, HTML' },
+        { repo: 'python-automation', commits: 32, languages: 'Python, Shell' },
+        { repo: 'web-scraper', commits: 28, languages: 'Python, JavaScript' },
+        { repo: 'mobile-app', commits: 67, languages: 'JavaScript, TypeScript' },
+        { repo: 'data-analysis', commits: 23, languages: 'Python, R' },
+        { repo: 'api-server', commits: 41, languages: 'Node.js, JavaScript' }
+      ];
+
+      // Simulate loading delay
+      setTimeout(() => {
+        setData(mockData);
+        setLastUpdated(new Date().toISOString());
+        setIsLoading(false);
+      }, 1000);
+
     } catch (err) {
       setError(err.message);
       console.error('Error fetching GitHub activity:', err);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -221,9 +178,43 @@ const Home = () => {
     fetchGitHubActivity();
   }, []);
 
-  // Calculate totals
+  // Calculate statistics
   const totalRepos = data.length;
-  const totalCommits = data.reduce((sum, repo) => sum + repo.commits, 0);
+  const totalCommits = data.reduce((sum, repo) => sum + (repo.commits || 0), 0);
+  const totalStars = 128; // You can calculate this from your data
+  const totalForks = 45;  // You can calculate this from your data
+
+  // Calculate active languages
+  const uniqueLanguages = new Set();
+  data.forEach(repo => {
+    if (repo.languages && repo.languages !== 'N/A') {
+      repo.languages.split(', ').forEach(lang => uniqueLanguages.add(lang));
+    }
+  });
+  const activeLanguages = uniqueLanguages.size;
+
+  // ADDED: Prepare data for the charts using useMemo for efficiency
+  const { commitChartData, languageChartData } = useMemo(() => {
+    // Data for the commit bar chart
+    const commitData = data.map(repo => ({
+      name: repo.repo,
+      commits: repo.commits
+    })).sort((a, b) => b.commits - a.commits); // Sort for better visualization
+
+    // Data for the language donut chart
+    const languageCount = {};
+    data.forEach(repo => {
+      if (repo.languages && repo.languages !== 'N/A') {
+        repo.languages.split(', ').forEach(lang => {
+          languageCount[lang] = (languageCount[lang] || 0) + 1;
+        });
+      }
+    });
+    const langData = Object.entries(languageCount).map(([name, value]) => ({ name, value }));
+
+    return { commitChartData: commitData, languageChartData: langData };
+  }, [data]);
+
 
   const handleRefresh = () => {
     fetchGitHubActivity();
@@ -231,8 +222,9 @@ const Home = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="min-h-screen bg-gray-50">
+        <Header currentPath="/" />
+        <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="flex items-center">
               <AlertCircle className="h-6 w-6 text-red-600 mr-3" />
@@ -256,8 +248,11 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header Component */}
+      <Header currentPath="/" />
+
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header Section */}
+        {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">GitHub Activity Dashboard</h1>
@@ -280,41 +275,100 @@ const Home = () => {
           </button>
         </div>
 
-        {/* Activity Overview */}
-        <GitHubActivityOverview 
+        {/* GitHub Activity Overview Component */}
+        <GitHubActivityOverview
           totalRepos={totalRepos}
           totalCommits={totalCommits}
+          totalStars={totalStars}
+          totalForks={totalForks}
+          activeLanguages={activeLanguages}
           isLoading={isLoading}
         />
 
-        {/* Charts and Lists */}
+        {/* REPLACED: Original CommitActivityChart section is now a grid with two charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 my-8">
+          {/* Commit Activity Chart */}
+          <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
+            {!isLoading && data.length > 0 ? (
+              <Charts.BarChartComponent
+                data={commitChartData}
+                xAxisKey="name"
+                barKey="commits"
+                title="Commits Per Repository"
+                height={400}
+                color="#10B981"
+              />
+            ) : (
+                <div className="flex justify-center items-center h-full">
+                    <div className="animate-pulse bg-gray-200 rounded-md w-full h-[400px]"></div>
+                </div>
+            )}
+          </div>
+
+          {/* Language Distribution Donut Chart */}
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+             {!isLoading && data.length > 0 ? (
+              <Charts.DonutChartComponent
+                data={languageChartData}
+                dataKey="value"
+                nameKey="name"
+                title="Language Distribution"
+                height={400}
+              />
+            ) : (
+                <div className="flex justify-center items-center h-full">
+                    <div className="animate-pulse bg-gray-200 rounded-full w-64 h-64"></div>
+                </div>
+            )}
+          </div>
+        </div>
+
+
+        {/* Secondary Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <CommitActivityChart 
+          {/* Language Distribution */}
+          <LanguageDistribution
             repositories={data}
             isLoading={isLoading}
           />
-          
+
+          {/* Additional Stats Card */}
           {!isLoading && data.length > 0 && (
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
-              <div className="space-y-3">
-                {Array.from(new Set(data.flatMap(repo => 
-                  repo.languages.split(', ').filter(lang => lang !== 'N/A')
-                ))).slice(0, 6).map((language, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">{language}</span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                      {data.filter(repo => repo.languages.includes(language)).length} repos
-                    </span>
-                  </div>
-                ))}
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Repository Stats</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Most Active Repository</span>
+                  <span className="text-sm font-bold text-green-600">
+                    {data.reduce((max, repo) => repo.commits > max.commits ? repo : max, data[0])?.repo}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Average Commits per Repo</span>
+                  <span className="text-sm font-bold text-blue-600">
+                    {totalRepos > 0 ? Math.round(totalCommits / totalRepos) : 0} commits
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Most Used Language</span>
+                  <span className="text-sm font-bold text-purple-600">
+                    {/* A more robust way to find the most used language */}
+                    {languageChartData.sort((a,b) => b.value - a.value)[0]?.name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Total Languages</span>
+                  <span className="text-sm font-bold text-orange-600">
+                    {activeLanguages} languages
+                  </span>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Repository List */}
-        <RepositoryList 
+        {/* Repository List Component */}
+        <RepositoryList
           repositories={data}
           isLoading={isLoading}
         />
