@@ -12,15 +12,19 @@ const COLORS = [
 // Custom tooltip component
 const CustomTooltip = ({ active, payload, label, formatter }) => {
   if (active && payload && payload.length) {
+    // Clean the label: remove carriage returns, newlines, and trim whitespace
+    const cleanedLabel = label ? String(label).replace(/[\r\n]/g, '').trim() : '';
+
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-        <p className="font-medium text-gray-900">{`${label}`}</p>
+        <p className="font-medium text-gray-900">{cleanedLabel}</p>
         {payload.map((entry, index) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {/* Corrected to use entry.name for better labeling */}
             {`${entry.name}: ${formatter ? formatter(entry.value) : entry.value}`}
           </p>
-        ))}\r\n      </div>
+        ))}
+      </div>
     );
   }
   return null;
@@ -32,9 +36,9 @@ export const LineChartComponent = ({
   xAxisKey,
   lineKey,
   height = 300,
-  color = COLORS[0],
   title,
-  formatter
+  color = '#3B82F6', // Default color
+  formatter // Optional formatter function for tooltip values
 }) => {
   return (
     <div className="w-full">
@@ -42,25 +46,16 @@ export const LineChartComponent = ({
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-          <XAxis
-            dataKey={xAxisKey}
-            stroke="#6B7280"
-            fontSize={12}
-          />
-          <YAxis
-            stroke="#6B7280"
-            fontSize={12}
-          />
-          <Tooltip
-            content={<CustomTooltip formatter={formatter} />}
-          />
+          <XAxis dataKey={xAxisKey} stroke="#6B7280" fontSize={12} />
+          <YAxis stroke="#6B7280" fontSize={12} />
+          <Tooltip content={<CustomTooltip formatter={formatter} />} />
+          <Legend />
           <Line
             type="monotone"
             dataKey={lineKey}
             stroke={color}
-            strokeWidth={3}
-            dot={{ fill: color, strokeWidth: 2, r: 4 }} // This ensures dots are visible
-            activeDot={{ r: 6, stroke: color, strokeWidth: 2 }}
+            activeDot={{ r: 8 }}
+            name={lineKey.charAt(0).toUpperCase() + lineKey.slice(1)} // Capitalize for legend/tooltip
           />
         </LineChart>
       </ResponsiveContainer>
@@ -74,41 +69,24 @@ export const BarChartComponent = ({
   xAxisKey,
   barKey,
   height = 300,
-  color = COLORS[1],
   title,
-  formatter,
-  horizontal = false
+  color = '#10B981', // Default color
+  formatter
 }) => {
   return (
     <div className="w-full">
       {title && <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>}
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-          layout={horizontal ? 'horizontal' : 'vertical'}
-        >
+        <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-          {horizontal ? (
-            <>
-              <XAxis type="number" stroke="#6B7280" fontSize={12} />
-              <YAxis type="category" dataKey={xAxisKey} stroke="#6B7280" fontSize={12} width={100} />
-            </>
-          ) : (
-            <>
-              <XAxis dataKey={xAxisKey} stroke="#6B7280" fontSize={12} />
-              <YAxis stroke="#6B7280" fontSize={12} />
-            </>
-          )}
-          <Tooltip
-            content={<CustomTooltip formatter={formatter} />}
-          />
+          <XAxis dataKey={xAxisKey} stroke="#6B7280" fontSize={12} />
+          <YAxis stroke="#6B7280" fontSize={12} />
+          <Tooltip content={<CustomTooltip formatter={formatter} />} />
+          <Legend />
           <Bar
             dataKey={barKey}
             fill={color}
-            stroke={color}
-            strokeWidth={1}
-            radius={[4, 4, 0, 0]}
+            name={barKey.charAt(0).toUpperCase() + barKey.slice(1)} // Capitalize for legend/tooltip
           />
         </BarChart>
       </ResponsiveContainer>
@@ -123,9 +101,7 @@ export const PieChartComponent = ({
   nameKey,
   height = 300,
   title,
-  showLegend = true,
-  innerRadius = 0,
-  outerRadius = 80
+  formatter
 }) => {
   return (
     <div className="w-full">
@@ -136,55 +112,68 @@ export const PieChartComponent = ({
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
-            paddingAngle={2}
+            labelLine={false}
+            outerRadius={100}
+            fill="#8884d8"
             dataKey={dataKey}
             nameKey={nameKey}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip
-            content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const data = payload[0];
-                return (
-                  <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                    <p className="font-medium text-gray-900">{data.name}</p>
-                    <p className="text-sm" style={{ color: data.payload.fill }}>
-                      {`${dataKey}: ${data.value}`}
-                    </p>
-                  </div>
-                );
-              }
-              return null;
-            }}
-          />
-          {showLegend && (
-            <Legend
-              verticalAlign="bottom"
-              height={36}
-              formatter={(value) => <span className="text-sm text-gray-700">{value}</span>}
-            />
-          )}
+          <Tooltip content={<CustomTooltip formatter={formatter} />} />
+          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
   );
 };
 
-// Donut Chart (Pie chart with inner radius)
-export const DonutChartComponent = (props) => {
-  return <PieChartComponent {...props} innerRadius={40} outerRadius={80} />;
+// Donut Chart Component (similar to Pie but with innerRadius)
+export const DonutChartComponent = ({
+  data,
+  dataKey,
+  nameKey,
+  height = 300,
+  title,
+  formatter
+}) => {
+  return (
+    <div className="w-full">
+      {title && <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>}
+      <ResponsiveContainer width="100%" height={height}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={60} // Donut hole
+            outerRadius={90}
+            fill="#8884d8"
+            dataKey={dataKey}
+            nameKey={nameKey}
+            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            paddingAngle={5} // Space between segments
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip formatter={formatter} />} />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
 };
 
-// Multi-line Chart Component
+// Multi-Line Chart Component (for multiple data series)
 export const MultiLineChartComponent = ({
   data,
   xAxisKey,
-  lines, // Array of {key, color, name}
+  lines, // Array of { key, color, name }
   height = 300,
   title,
   formatter
@@ -195,18 +184,9 @@ export const MultiLineChartComponent = ({
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-          <XAxis
-            dataKey={xAxisKey}
-            stroke="#6B7280"
-            fontSize={12}
-          />
-          <YAxis
-            stroke="#6B7280"
-            fontSize={12}
-          />
-          <Tooltip
-            content={<CustomTooltip formatter={formatter} />}
-          />
+          <XAxis dataKey={xAxisKey} stroke="#6B7280" fontSize={12} />
+          <YAxis stroke="#6B7280" fontSize={12} />
+          <Tooltip content={<CustomTooltip formatter={formatter} />} />
           <Legend />
           {lines.map((line, index) => (
             <Line
@@ -214,10 +194,8 @@ export const MultiLineChartComponent = ({
               type="monotone"
               dataKey={line.key}
               stroke={line.color || COLORS[index % COLORS.length]}
-              strokeWidth={2}
-              name={line.name || line.key}
-              dot={{ r: 3 }}
               activeDot={{ r: 5 }}
+              name={line.name || line.key.charAt(0).toUpperCase() + line.key.slice(1)}
             />
           ))}
         </LineChart>
@@ -253,21 +231,11 @@ export const StackedBarChartComponent = ({
               dataKey={bar.key}
               stackId="a"
               fill={bar.color || COLORS[index % COLORS.length]}
-              name={bar.name || bar.key}
+              name={bar.name || bar.key.charAt(0).toUpperCase() + bar.key.slice(1)}
             />
           ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
-};
-
-// Default export to align with the import in home.jsx
-export default {
-  LineChartComponent,
-  BarChartComponent,
-  PieChartComponent,
-  DonutChartComponent,
-  MultiLineChartComponent,
-  StackedBarChartComponent
 };

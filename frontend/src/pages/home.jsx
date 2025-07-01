@@ -12,7 +12,7 @@ const RepositoryList = ({ repositories, isLoading }) => {
         <h2 className="text-xl font-bold text-gray-900 mb-4">Repositories</h2>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse flex items-center space-x-4 p-4 border rounded-lg">
+            <div key={i} className="animate-pulse flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
               <div className="bg-gray-200 h-4 w-32 rounded"></div>
               <div className="bg-gray-200 h-4 w-16 rounded"></div>
               <div className="bg-gray-200 h-4 w-24 rounded"></div>
@@ -195,7 +195,8 @@ const Home = () => {
   const { commitChartData, languageChartData } = useMemo(() => {
     // Data for the commit line chart - MODIFIED to sort for line chart
     const commitData = data.map(repo => ({
-      name: repo.repo,
+      // Clean repo name by removing newline characters
+      name: repo.repo.replace(/[\r\n]/g, ''),
       commits: repo.commits
     })).sort((a, b) => a.name.localeCompare(b.name)); // Sort by name for consistent line chart
 
@@ -221,7 +222,6 @@ const Home = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* <Header currentPath="/" /> COMMENTED OUT */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="flex items-center">
@@ -246,9 +246,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Component */}
-      {/* <Header currentPath="/" /> COMMENTED OUT */}
-
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
@@ -263,14 +260,25 @@ const Home = () => {
               </p>
             )}
           </div>
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            {isLoading ? 'Refreshing...' : 'Refresh'}
-          </button>
+          {/* Refresh button and Check my GitHub link */}
+          <div className="flex flex-col items-end gap-2"> {/* Added flex container for alignment */}
+            <button
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              {isLoading ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <a
+              href="https://github.com/SinhleM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+            >
+              Check my GitHub <Github className="h-4 w-4 inline" />
+            </a>
+          </div>
         </div>
 
         {/* GitHub Activity Overview Component */}
@@ -283,18 +291,18 @@ const Home = () => {
           isLoading={isLoading}
         />
 
-        {/* Commit Activity Chart section - MODIFIED to LineChartComponent */}
+        {/* Commit Activity Chart section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 my-8">
           {/* Commit Activity Chart */}
           <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
             {!isLoading && data.length > 0 ? (
-              <LineChartComponent // CHANGED from BarChartComponent to LineChartComponent
+              <LineChartComponent
                 data={commitChartData}
                 xAxisKey="name"
-                lineKey="commits" // Use lineKey for LineChartComponent
+                lineKey="commits"
                 title="Commits Per Repository"
                 height={400}
-                color="#10B981"
+                color="#3B82F6" // Default blue
               />
             ) : (
                 <div className="flex justify-center items-center h-full">
