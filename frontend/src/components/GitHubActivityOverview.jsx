@@ -30,7 +30,7 @@ const GitHubActivityOverview = ({
     },
     {
       title: 'Active Languages',
-      value: activeLanguages, // Removed hardcoded '5+'
+      value: activeLanguages,
       icon: Code2,
       color: 'purple',
       borderColor: 'border-purple-500',
@@ -71,13 +71,13 @@ const GitHubActivityOverview = ({
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"> {/* MODIFIED: Changed from xl:grid-cols-6 to lg:grid-cols-3 */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <div
             key={index}
-            className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${stat.borderColor} hover:shadow-lg transition-shadow duration-200`}
+            className={`bg-white rounded-lg shadow-md p-4 border-l-4 ${stat.borderColor} hover:shadow-lg transition-shadow duration-200`}
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">

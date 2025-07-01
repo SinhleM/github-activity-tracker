@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, RefreshCw, Github, GitCommit, Code2, Calendar } from 'lucide-react';
 
-import Header from '../components/Header.jsx';
+// import Header from '../components/Header.jsx'; // COMMENTED OUT: Header component removed
 import GitHubActivityOverview from '../components/GitHubActivityOverview.jsx';
 import { LineChartComponent, BarChartComponent, PieChartComponent, DonutChartComponent, MultiLineChartComponent, StackedBarChartComponent } from '../components/Charts.jsx';
 
@@ -179,8 +179,8 @@ const Home = () => {
   // Calculate statistics
   const totalRepos = data.length;
   const totalCommits = data.reduce((sum, repo) => sum + (repo.commits || 0), 0);
-  const totalStars = data.reduce((sum, repo) => sum + (repo.stars || 0), 0); // MODIFIED
-  const totalForks = data.reduce((sum, repo) => sum + (repo.forks || 0), 0); // MODIFIED
+  const totalStars = data.reduce((sum, repo) => sum + (repo.stars || 0), 0);
+  const totalForks = data.reduce((sum, repo) => sum + (repo.forks || 0), 0);
 
   // Calculate active languages
   const uniqueLanguages = new Set();
@@ -193,11 +193,11 @@ const Home = () => {
 
   // Prepare data for the charts using useMemo for efficiency
   const { commitChartData, languageChartData } = useMemo(() => {
-    // Data for the commit bar chart
+    // Data for the commit line chart - MODIFIED to sort for line chart
     const commitData = data.map(repo => ({
       name: repo.repo,
       commits: repo.commits
-    })).sort((a, b) => b.commits - a.commits); // Sort for better visualization
+    })).sort((a, b) => a.name.localeCompare(b.name)); // Sort by name for consistent line chart
 
     // Data for the language donut chart
     const languageCount = {};
@@ -221,7 +221,7 @@ const Home = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header currentPath="/" />
+        {/* <Header currentPath="/" /> COMMENTED OUT */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="flex items-center">
@@ -247,7 +247,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Component */}
-      <Header currentPath="/" />
+      {/* <Header currentPath="/" /> COMMENTED OUT */}
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Page Header */}
@@ -283,15 +283,15 @@ const Home = () => {
           isLoading={isLoading}
         />
 
-        {/* REPLACED: Original CommitActivityChart section is now a grid with two charts */}
+        {/* Commit Activity Chart section - MODIFIED to LineChartComponent */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 my-8">
           {/* Commit Activity Chart */}
           <div className="lg:col-span-3 bg-white rounded-lg shadow-md p-6">
             {!isLoading && data.length > 0 ? (
-              <BarChartComponent // Using BarChartComponent from Chart.jsx
+              <LineChartComponent // CHANGED from BarChartComponent to LineChartComponent
                 data={commitChartData}
                 xAxisKey="name"
-                barKey="commits"
+                lineKey="commits" // Use lineKey for LineChartComponent
                 title="Commits Per Repository"
                 height={400}
                 color="#10B981"
@@ -306,7 +306,7 @@ const Home = () => {
           {/* Language Distribution Donut Chart */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
              {!isLoading && data.length > 0 ? (
-              <DonutChartComponent // Using DonutChartComponent from Chart.jsx
+              <DonutChartComponent
                 data={languageChartData}
                 dataKey="value"
                 nameKey="name"

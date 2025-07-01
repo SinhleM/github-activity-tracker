@@ -2,26 +2,36 @@
     {
         "repo":"cousera-answers",
         "commits":0,
-        "languages":""
+        "languages":"",
+        "stars":0,
+        "forks":0
     },
     {
         "repo":"exercism-javascript-practice",
         "commits":0,
-        "languages":""
+        "languages":"",
+        "stars":0,
+        "forks":0
     },
     {
         "repo":"Practice",
         "commits":1,
-        "languages":"JavaScript, CSS, PHP, HTML"
+        "languages":"JavaScript, CSS, PHP, HTML",
+        "stars":0,
+        "forks":0
     },
     {
         "repo":"simple-movie-web-app",
         "commits":7,
-        "languages":"JavaScript, CSS, HTML"
+        "languages":"JavaScript, CSS, HTML",
+        "stars":0,
+        "forks":0
     },
     {
         "repo":"SinhleM",
         "commits":2,
-        "languages":""
+        "languages":"",
+        "stars":0,
+        "forks":0
     }
 ]

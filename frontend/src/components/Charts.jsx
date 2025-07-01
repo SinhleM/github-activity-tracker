@@ -20,8 +20,7 @@ const CustomTooltip = ({ active, payload, label, formatter }) => {
             {/* Corrected to use entry.name for better labeling */}
             {`${entry.name}: ${formatter ? formatter(entry.value) : entry.value}`}
           </p>
-        ))}
-      </div>
+        ))}\r\n      </div>
     );
   }
   return null;
@@ -60,7 +59,7 @@ export const LineChartComponent = ({
             dataKey={lineKey}
             stroke={color}
             strokeWidth={3}
-            dot={{ fill: color, strokeWidth: 2, r: 4 }}
+            dot={{ fill: color, strokeWidth: 2, r: 4 }} // This ensures dots are visible
             activeDot={{ r: 6, stroke: color, strokeWidth: 2 }}
           />
         </LineChart>
@@ -80,13 +79,11 @@ export const BarChartComponent = ({
   formatter,
   horizontal = false
 }) => {
-  const ChartComponent = horizontal ? BarChart : BarChart;
-
   return (
     <div className="w-full">
       {title && <h3 className="text-lg font-semibold text-gray-800 mb-4">{title}</h3>}
       <ResponsiveContainer width="100%" height={height}>
-        <ChartComponent
+        <BarChart
           data={data}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           layout={horizontal ? 'horizontal' : 'vertical'}
@@ -109,9 +106,11 @@ export const BarChartComponent = ({
           <Bar
             dataKey={barKey}
             fill={color}
+            stroke={color}
+            strokeWidth={1}
             radius={[4, 4, 0, 0]}
           />
-        </ChartComponent>
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );
@@ -263,7 +262,7 @@ export const StackedBarChartComponent = ({
   );
 };
 
-// ADDED: Default export to align with the import in home.jsx
+// Default export to align with the import in home.jsx
 export default {
   LineChartComponent,
   BarChartComponent,
