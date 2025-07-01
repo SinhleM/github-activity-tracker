@@ -1,13 +1,13 @@
 import React from 'react';
 import { Github, GitCommit, Code2, Calendar, Star, GitFork, Users, TrendingUp } from 'lucide-react';
 
-const GitHubActivityOverview = ({ 
-  totalRepos = 0, 
-  totalCommits = 0, 
+const GitHubActivityOverview = ({
+  totalRepos = 0,
+  totalCommits = 0,
   totalStars = 0,
   totalForks = 0,
   activeLanguages = 0,
-  isLoading = false 
+  isLoading = false
 }) => {
   const stats = [
     {
@@ -30,7 +30,7 @@ const GitHubActivityOverview = ({
     },
     {
       title: 'Active Languages',
-      value: activeLanguages || '5+',
+      value: activeLanguages, // Removed hardcoded '5+'
       icon: Code2,
       color: 'purple',
       borderColor: 'border-purple-500',
@@ -71,11 +71,11 @@ const GitHubActivityOverview = ({
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"> {/* MODIFIED: Changed from xl:grid-cols-6 to lg:grid-cols-3 */}
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <div 
+          <div
             key={index}
             className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${stat.borderColor} hover:shadow-lg transition-shadow duration-200`}
           >
@@ -96,7 +96,7 @@ const GitHubActivityOverview = ({
                 <Icon className={`h-6 w-6 ${stat.iconColor}`} />
               </div>
             </div>
-            
+
             {/* Optional: Add a trend indicator */}
             {!isLoading && typeof stat.value === 'number' && stat.value > 0 && (
               <div className="mt-4 flex items-center text-sm text-green-600">

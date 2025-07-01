@@ -3,8 +3,7 @@ import { AlertCircle, RefreshCw, Github, GitCommit, Code2, Calendar } from 'luci
 
 import Header from '../components/Header.jsx';
 import GitHubActivityOverview from '../components/GitHubActivityOverview.jsx';
-// Corrected import for multiple chart components from Chart.jsx
-import { LineChartComponent, BarChartComponent, PieChartComponent, DonutChartComponent, MultiLineChartComponent, StackedBarChartComponent } from '../components/Charts.jsx'; 
+import { LineChartComponent, BarChartComponent, PieChartComponent, DonutChartComponent, MultiLineChartComponent, StackedBarChartComponent } from '../components/Charts.jsx';
 
 const RepositoryList = ({ repositories, isLoading }) => {
   if (isLoading) {
@@ -149,27 +148,26 @@ const Home = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      // Removed mock data and setTimeout
+
       const response = await fetch('/api/github-activity');
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      
+
       if (result.error) {
         throw new Error(result.error);
       }
-      
+
       setData(result);
       setLastUpdated(new Date().toISOString());
-      
+
     } catch (err) {
       setError(err.message);
       console.error('Error fetching GitHub activity:', err);
-    } finally { // Use finally to ensure isLoading is set to false
+    } finally {
       setIsLoading(false);
     }
   };
@@ -181,9 +179,9 @@ const Home = () => {
   // Calculate statistics
   const totalRepos = data.length;
   const totalCommits = data.reduce((sum, repo) => sum + (repo.commits || 0), 0);
-  const totalStars = 128; // You can calculate this from your data
-  const totalForks = 45;  // You can calculate this from your data
-  
+  const totalStars = data.reduce((sum, repo) => sum + (repo.stars || 0), 0); // MODIFIED
+  const totalForks = data.reduce((sum, repo) => sum + (repo.forks || 0), 0); // MODIFIED
+
   // Calculate active languages
   const uniqueLanguages = new Set();
   data.forEach(repo => {
@@ -250,7 +248,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header Component */}
       <Header currentPath="/" />
-      
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
@@ -276,7 +274,7 @@ const Home = () => {
         </div>
 
         {/* GitHub Activity Overview Component */}
-        <GitHubActivityOverview 
+        <GitHubActivityOverview
           totalRepos={totalRepos}
           totalCommits={totalCommits}
           totalStars={totalStars}
@@ -327,11 +325,11 @@ const Home = () => {
         {/* Secondary Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Language Distribution */}
-          <LanguageDistribution 
+          <LanguageDistribution
             repositories={data}
             isLoading={isLoading}
           />
-          
+
           {/* Additional Stats Card */}
           {!isLoading && data.length > 0 && (
             <div className="bg-white rounded-lg shadow-md p-6">
@@ -352,7 +350,6 @@ const Home = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Most Used Language</span>
                   <span className="text-sm font-bold text-purple-600">
-                    {/* A more robust way to find the most used language */}
                     {languageChartData.sort((a,b) => b.value - a.value)[0]?.name || 'N/A'}
                   </span>
                 </div>
@@ -368,7 +365,7 @@ const Home = () => {
         </div>
 
         {/* Repository List Component */}
-        <RepositoryList 
+        <RepositoryList
           repositories={data}
           isLoading={isLoading}
         />
