@@ -1,26 +1,5 @@
 [
     {
-        "repo":"cousera-answers",
-        "commits":0,
-        "languages":"",
-        "stars":0,
-        "forks":0
-    },
-    {
-        "repo":"exercism-javascript-practice",
-        "commits":0,
-        "languages":"",
-        "stars":0,
-        "forks":0
-    },
-    {
-        "repo":"Practice",
-        "commits":1,
-        "languages":"JavaScript, CSS, PHP, HTML",
-        "stars":0,
-        "forks":0
-    },
-    {
         "repo":"simple-movie-web-app",
         "commits":7,
         "languages":"JavaScript, CSS, HTML",
@@ -31,6 +10,13 @@
         "repo":"SinhleM",
         "commits":2,
         "languages":"",
+        "stars":0,
+        "forks":0
+    },
+    {
+        "repo":"tailtrade-app",
+        "commits":61,
+        "languages":"JavaScript, PHP, HTML, CSS",
         "stars":0,
         "forks":0
     }

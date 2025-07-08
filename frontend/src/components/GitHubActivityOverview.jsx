@@ -67,7 +67,7 @@ const GitHubActivityOverview = ({
   ];
 
   const LoadingSkeleton = () => (
-    <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+    <div className="animate-pulse bg-gray-200 h-8 w-16"></div>
   );
 
   return (
@@ -77,7 +77,7 @@ const GitHubActivityOverview = ({
         return (
           <div
             key={index}
-            className={`bg-white rounded-lg shadow-md p-4 border-l-4 ${stat.borderColor} hover:shadow-lg transition-shadow duration-200`}
+            className={`bg-white shadow-md p-4 border-l-4 ${stat.borderColor} hover:shadow-lg transition-shadow duration-200`}
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -92,7 +92,7 @@ const GitHubActivityOverview = ({
                   )}
                 </div>
               </div>
-              <div className={`flex items-center justify-center w-12 h-12 rounded-lg ${stat.bgColor}`}>
+              <div className={`flex items-center justify-center w-12 h-12 ${stat.bgColor}`}>
                 <Icon className={`h-6 w-6 ${stat.iconColor}`} />
               </div>
             </div>

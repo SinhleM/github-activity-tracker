@@ -16,7 +16,7 @@ const CustomTooltip = ({ active, payload, label, formatter }) => {
     const cleanedLabel = label ? String(label).replace(/[\r\n]/g, '').trim() : '';
 
     return (
-      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+      <div className="bg-white p-3 shadow-lg"> {/* Removed border and rounded-lg */}
         <p className="font-medium text-gray-900">{cleanedLabel}</p>
         {payload.map((entry, index) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
