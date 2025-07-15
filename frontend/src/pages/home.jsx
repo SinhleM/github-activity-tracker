@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, RefreshCw, Github, GitCommit, Code2 } from 'lucide-react';
+import { AlertCircle, RefreshCw, Github, GitCommit, Code2, Star, GitFork } from 'lucide-react'; // Added Star and GitFork for overview
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+// Assuming GitHubActivityOverview, LineChartComponent, and DonutChartComponent
+// are styled to align with the new sharp aesthetic
 import GitHubActivityOverview from '../components/GitHubActivityOverview.jsx';
 import { LineChartComponent, DonutChartComponent } from '../components/Charts.jsx';
 
+// Component for displaying a list of repositories
 const RepositoryList = ({ repositories, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="bg-white shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Repositories</h2>
+      <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Repositories</h2>
         <div className="space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="animate-pulse flex items-center space-x-4 p-4">
-              <div className="bg-gray-200 h-4 w-32"></div>
-              <div className="bg-gray-200 h-4 w-16"></div>
-              <div className="bg-gray-200 h-4 w-24"></div>
+            <div key={i} className="flex items-center space-x-4 py-3">
+              <div className="bg-gray-200 h-5 w-48 rounded"></div>
+              <div className="bg-gray-200 h-5 w-24 rounded"></div>
+              <div className="bg-gray-200 h-5 w-32 rounded"></div>
             </div>
           ))}
         </div>
@@ -25,44 +28,44 @@ const RepositoryList = ({ repositories, isLoading }) => {
   }
 
   return (
-    <div className="bg-white shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Repositories</h2>
+    <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Repositories</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Repository
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Commits
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Languages
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {repositories.map((repo, index) => (
-              <tr key={index} className="hover:bg-gray-50">
+              <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <Github className="h-5 w-5 text-gray-400 mr-3" />
+                    <Github className="h-5 w-5 text-gray-500 mr-3" />
                     <div className="text-sm font-medium text-gray-900">{repo.repo}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <GitCommit className="h-4 w-4 text-green-500 mr-2" />
-                    <span className="text-sm text-gray-900">{repo.commits}</span>
+                    <GitCommit className="h-4 w-4 text-emerald-500 mr-2" /> {/* Sharper green */}
+                    <span className="text-sm text-gray-800">{repo.commits}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-2">
                     {repo.languages.split(', ').map((lang, langIndex) => (
                       <span
                         key={langIndex}
-                        className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800"
+                        className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-md border border-blue-200" // Sharper tags
                       >
                         {lang}
                       </span>
@@ -78,16 +81,17 @@ const RepositoryList = ({ repositories, isLoading }) => {
   );
 };
 
+// Component for displaying language distribution
 const LanguageDistribution = ({ repositories, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="bg-white shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
-        <div className="animate-pulse space-y-3">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Language Distribution</h2>
+        <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="bg-gray-200 h-4 w-20"></div>
-              <div className="bg-gray-200 h-6 w-16"></div>
+            <div key={i} className="flex items-center justify-between py-2">
+              <div className="bg-gray-200 h-4 w-24 rounded"></div>
+              <div className="bg-gray-200 h-6 w-16 rounded"></div>
             </div>
           ))}
         </div>
@@ -97,11 +101,11 @@ const LanguageDistribution = ({ repositories, isLoading }) => {
 
   if (!repositories || repositories.length === 0) {
     return (
-      <div className="bg-white shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Language Distribution</h2>
         <div className="text-center text-gray-500 py-8">
           <Code2 className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <p>No language data available</p>
+          <p>No language data available.</p>
         </div>
       </div>
     );
@@ -122,13 +126,13 @@ const LanguageDistribution = ({ repositories, isLoading }) => {
     .slice(0, 6);
 
   return (
-    <div className="bg-white shadow-md p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Language Distribution</h2>
-      <div className="space-y-3">
+    <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Language Distribution</h2>
+      <div className="space-y-4">
         {sortedLanguages.map(([language, count], index) => (
-          <div key={index} className="flex items-center justify-between">
+          <div key={index} className="flex items-center justify-between py-1">
             <span className="text-sm font-medium text-gray-700">{language}</span>
-            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800">
+            <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200">
               {count} {count === 1 ? 'repo' : 'repos'}
             </span>
           </div>
@@ -138,6 +142,7 @@ const LanguageDistribution = ({ repositories, isLoading }) => {
   );
 };
 
+// Main Home component for the dashboard
 const Home = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -209,22 +214,20 @@ const Home = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="bg-red-50 p-6">
-            <div className="flex items-center">
-              <AlertCircle className="h-6 w-6 text-red-600 mr-3" />
-              <div>
-                <h3 className="text-lg font-medium text-red-800">Error Loading GitHub Activity</h3>
-                <p className="text-red-700 mt-1">{error}</p>
-                <button
-                  onClick={handleRefresh}
-                  className="mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:ring-2 focus:ring-red-500"
-                >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Try Again
-                </button>
-              </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="max-w-md w-full mx-auto p-6 bg-white border border-red-300 rounded-lg shadow-lg">
+          <div className="flex items-start">
+            <AlertCircle className="h-7 w-7 text-red-600 mr-4 mt-1" />
+            <div>
+              <h3 className="text-xl font-semibold text-red-800 mb-2">Error Loading Data</h3>
+              <p className="text-red-700 text-sm">{error}</p>
+              <button
+                onClick={handleRefresh}
+                className="mt-5 inline-flex items-center px-5 py-2.5 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-md border border-red-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Again
+              </button>
             </div>
           </div>
         </div>
@@ -233,44 +236,46 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col">
+    <div className="min-h-screen bg-zinc-100 flex flex-col font-sans"> {/* Changed bg-zinc-50 to bg-zinc-100 for a slightly lighter, crisper background */}
       {/* Header */}
       <Header />
 
       {/* Main Content */}
       <main className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-10"> {/* Increased padding */}
           {/* Dashboard Heading */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-10"> {/* Increased margin-bottom */}
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">GitHub Activity Dashboard</h1>
-              <p className="text-gray-600 mt-2">Track your repositories, commits, and coding activity</p>
+              <h1 className="text-4xl font-semibold text-gray-900 leading-tight">GitHub Activity Dashboard</h1> {/* Larger, bolder heading */}
+              <p className="text-lg text-gray-700 mt-3">Comprehensive insights into my coding ecosystem.</p> {/* Larger, more descriptive sub-heading */}
               {lastUpdated && !isLoading && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Last updated: {new Date(lastUpdated).toLocaleString()}
+                <p className="text-sm text-gray-500 mt-2">
+                  Last updated: <span className="font-medium">{new Date(lastUpdated).toLocaleString()}</span>
                 </p>
               )}
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end gap-3"> {/* Increased gap */}
               <button
                 onClick={handleRefresh}
                 disabled={isLoading}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className="inline-flex items-center px-5 py-2.5 text-base font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-md border border-gray-300 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" // Sharper button
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                {isLoading ? 'Refreshing...' : 'Refresh'}
+                {isLoading ? 'Refreshing...' : 'Refresh Data'} {/* Clearer button text */}
               </button>
               <a
                 href="https://github.com/SinhleM"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1.5 font-medium transition-colors duration-200" // Blue link for prominence
               >
-                Check my GitHub <Github className="h-4 w-4 inline" />
+                View My GitHub Profile <Github className="h-4 w-4 inline ml-0.5" />
               </a>
             </div>
           </div>
 
+          {/* GitHub Activity Overview - Assuming this component is updated internally */}
+          {/* You'll need to apply similar styling principles within GitHubActivityOverview.jsx */}
           <GitHubActivityOverview
             totalRepos={totalRepos}
             totalCommits={totalCommits}
@@ -280,8 +285,8 @@ const Home = () => {
             isLoading={isLoading}
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 my-8">
-            <div className="lg:col-span-3 bg-white shadow-md p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 my-10"> {/* Increased gap and margin */}
+            <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-6 flex flex-col justify-between"> {/* Added border and rounded corners */}
               {!isLoading && data.length > 0 ? (
                 <LineChartComponent
                   data={commitChartData}
@@ -289,13 +294,15 @@ const Home = () => {
                   lineKey="commits"
                   title="Commits Per Repository"
                   height={400}
-                  color="#3B82F6"
+                  color="#3B82F6" // Retained a sharp blue
                 />
               ) : (
-                <div className="animate-pulse bg-gray-200 w-full h-[400px]" />
+                <div className="flex items-center justify-center h-[400px] bg-gray-50 text-gray-400 border border-gray-200 rounded-md animate-pulse">
+                  <span className="text-lg">Loading Commit Data...</span>
+                </div>
               )}
             </div>
-            <div className="lg:col-span-2 bg-white shadow-md p-6">
+            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-6 flex flex-col justify-between"> {/* Added border and rounded corners */}
               {!isLoading && data.length > 0 ? (
                 <DonutChartComponent
                   data={languageChartData}
@@ -305,39 +312,55 @@ const Home = () => {
                   height={400}
                 />
               ) : (
-                <div className="animate-pulse bg-gray-200 w-64 h-64" />
+                <div className="flex items-center justify-center h-[400px] bg-gray-50 text-gray-400 border border-gray-200 rounded-md animate-pulse">
+                   <span className="text-lg">Loading Language Distribution...</span>
+                </div>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10"> {/* Increased gap and margin */}
             <LanguageDistribution repositories={data} isLoading={isLoading} />
             {!isLoading && data.length > 0 && (
-              <div className="bg-white shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Repository Stats</h2>
+              <div className="bg-white border border-gray-200 rounded-lg p-6"> {/* Added border and rounded corners */}
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Repository Statistics</h2> {/* More formal heading */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Most Active Repository</span>
-                    <span className="text-sm font-bold text-green-600">
-                      {data.reduce((max, repo) => repo.commits > max.commits ? repo : max, data[0])?.repo}
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3"> {/* Subtle borders for separation */}
+                    <span className="text-base font-medium text-gray-700">Most Active Repository</span>
+                    <span className="text-base font-bold text-emerald-600"> {/* Sharper green */}
+                      {data.reduce((max, repo) => repo.commits > max.commits ? repo : max, data[0])?.repo || 'N/A'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Average Commits per Repo</span>
-                    <span className="text-sm font-bold text-blue-600">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <span className="text-base font-medium text-gray-700">Average Commits per Repo</span>
+                    <span className="text-base font-bold text-blue-600">
                       {totalRepos > 0 ? Math.round(totalCommits / totalRepos) : 0} commits
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Most Used Language</span>
-                    <span className="text-sm font-bold text-purple-600">
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <span className="text-base font-medium text-gray-700">Most Used Language</span>
+                    <span className="text-base font-bold text-purple-600">
                       {languageChartData.sort((a, b) => b.value - a.value)[0]?.name || 'N/A'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Total Languages</span>
-                    <span className="text-sm font-bold text-orange-600">{activeLanguages} languages</span>
+                  <div className="flex items-center justify-between"> {/* No bottom border on the last item */}
+                    <span className="text-base font-medium text-gray-700">Total Unique Languages</span>
+                    <span className="text-base font-bold text-orange-600">{activeLanguages} languages</span>
                   </div>
+                </div>
+              </div>
+            )}
+            {/* Loading state for Repository Stats */}
+            {isLoading && (
+              <div className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Repository Statistics</h2>
+                <div className="space-y-4">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between py-2">
+                      <div className="bg-gray-200 h-4 w-40 rounded"></div>
+                      <div className="bg-gray-200 h-4 w-24 rounded"></div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

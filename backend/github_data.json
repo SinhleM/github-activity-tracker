@@ -1,5 +1,26 @@
 [
     {
+        "repo":"fnb-fraud-detection",
+        "commits":14,
+        "languages":"JavaScript, Python, CSS, HTML",
+        "stars":0,
+        "forks":0
+    },
+    {
+        "repo":"github-activity-tracker",
+        "commits":9,
+        "languages":"JavaScript, Python, HTML, CSS",
+        "stars":0,
+        "forks":0
+    },
+    {
+        "repo":"portfolio",
+        "commits":12,
+        "languages":"JavaScript, CSS, HTML",
+        "stars":0,
+        "forks":0
+    },
+    {
         "repo":"simple-movie-web-app",
         "commits":7,
         "languages":"JavaScript, CSS, HTML",
@@ -8,14 +29,14 @@
     },
     {
         "repo":"SinhleM",
-        "commits":2,
+        "commits":6,
         "languages":"",
         "stars":0,
         "forks":0
     },
     {
         "repo":"tailtrade-app",
-        "commits":61,
+        "commits":62,
         "languages":"JavaScript, PHP, HTML, CSS",
         "stars":0,
         "forks":0
